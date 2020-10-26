@@ -106,9 +106,9 @@ def handbrake_all(srcpath, basepath, logfile, disc):
         # pattern = re.compile(r'\bscan\:.*\btitle\(s\)')
 
         if disc.disctype == "bluray":
-            result = re.search('scan: BD has (.*) title\(s\)', line)
+            result = re.search(r'scan: BD has (.*) title\(s\)', line)
         else:
-            result = re.search('scan: DVD has (.*) title\(s\)', line)
+            result = re.search(r'scan: DVD has (.*) title\(s\)', line)
 
         if result:
             titles = result.group(1)
@@ -275,7 +275,7 @@ def get_title_length(title, srcpath):
             stderr=subprocess.STDOUT,
             shell=True
         ).decode("utf-8").splitlines()
-    except subprocess.CalledProcessError as hb_error:
+    except subprocess.CalledProcessError:
         # err = "Call to handbrake failed with code: " + str(hb_error.returncode) + "(" + str(hb_error.output) + ")"
         logging.debug("Couldn't find a valid track.  Try running the command manually to see more specific errors.")
         return(-1)
