@@ -313,7 +313,7 @@ def rip_data(job, datapath, logfile):
         cmd = 'dd if="{0}" of="{1}" {2} 2>> {3}'.format(
             job.devpath,
             filename,
-            cfg["DATA_RIP_PARAMETERS"],
+            job.config.DATA_RIP_PARAMETERS,
             logfile
         )
 
