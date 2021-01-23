@@ -173,6 +173,8 @@ case "\$1" in
 esac" > /etc/init.d/arm-continueInstall
                 update-rc.d arm-continueInstall defaults
                 reboot
+            else
+                echo -e "Cancelling installation..."
             fi
         fi
     fi
