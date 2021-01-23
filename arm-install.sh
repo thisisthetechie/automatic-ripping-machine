@@ -172,7 +172,7 @@ case "\$1" in
         ;;
     stop|restart|reload)
         ;;
-esac" | tee -a /etc/init.d/arm-continueInstall
+esac" > /etc/init.d/arm-continueInstall
         update-rc.d arm-continueInstall defaults
         reboot
     fi
