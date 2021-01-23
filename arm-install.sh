@@ -5,10 +5,6 @@ if [[ $1 == "--verbose" ]]; then
     VERBOSE=true
 elif [[ $1 == "--noop" ]]; then
     NOOP=true
-else
-    echo "Unrecognised switch $1"
-    echo "usage: arm-install.sh [--verbose|noop]"
-    exit 1
 fi
 
 #################
@@ -32,103 +28,105 @@ log() {
 }
 
 stage1() {
-    printf "Adding ${BLUE}ppa:graphics-drivers/ppa${NC}... "
-    log sudo add-apt-repository ppa:graphics-drivers/ppa
-    printf "Updating packages... "
-    log sudo apt upgrade -y && sudo apt update -y && \
-        sudo apt install avahi-daemon -y && sudo systemctl restart avahi-daemon && \
-        sudo apt install ubuntu-drivers-common -y && sudo ubuntu-drivers install 
+    printf " - Adding ${BLUE}ppa:graphics-drivers/ppa${NC}... "
+    log add-apt-repository ppa:graphics-drivers/ppa
+    printf " - Updating packages... "
+    log apt upgrade -y && apt update -y && \
+        apt install avahi-daemon -y && systemctl restart avahi-daemon && \
+        apt install ubuntu-drivers-common -y && ubuntu-drivers install 
     printf "\n${BLUE}Finished stage 1${NC}\n===============n"
     printf "Press ${YELLOW}ENTER${NC} to reboot or ${YELLOW}CTRL-C${NC} to cancel"
     read input
 }
 
 stage2() {
-    log sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-    printf "Creating ${BLUE}arm${NC} user and group... "
-    log sudo groupadd arm && \
-        sudo usermod -aG arm $USER && \
-        sudo useradd -m arm -g arm -G cdrom
-    printf "Setting ${BLUE}arm${NC} user password... "
+    printf "${BLUE}Continuing installation of arm...${NC}\n=================================\n\n"
+    printf " - Disabling sleep and hibernation... "
+    log systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+    printf " - Creating ${BLUE}arm${NC} user and group... "
+    log groupadd arm && \
+        usermod -aG arm $USER && \
+        useradd -m arm -g arm -G cdrom
+    printf " - Setting ${BLUE}arm${NC} user password... "
     ARM_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
-    log echo 'arm:${ARM_PASSWORD}' | sudo chpasswd
-    printf "Set up repos and install git... "
-    log sudo apt-get install git -y && \
-        sudo add-apt-repository ppa:heyarje/makemkv-beta && \
-        sudo add-apt-repository ppa:stebbins/handbrake-releases
-    printf "Getting Debian Release and adding ${BLUE}mc3man${NC} repository... "
+    log echo 'arm:${ARM_PASSWORD}' | chpasswd
+    printf " - Set up repos and install git... "
+    log apt-get install git -y && \
+        add-apt-repository ppa:heyarje/makemkv-beta && \
+        add-apt-repository ppa:stebbins/handbrake-releases
+    printf " - Getting Debian Release and adding ${BLUE}mc3man${NC} repository... "
     case $(cut -f2 <<< $(lsb_release -r)) in 
         "16.04" ) 
             printf "${GREEN}Found '16.04' (xerus)\n"
-            sudo add-apt-repository ppa:mc3man/xerus-media
+            add-apt-repository ppa:mc3man/xerus-media
             ;; 
         "18.04" ) 
             printf "${GREEN}Found '18.04' (bionic)\n"
-            sudo add-apt-repository ppa:mc3man/bionic-prop
+            add-apt-repository ppa:mc3man/bionic-prop
             ;; 
         "20.04" ) 
             printf "${GREEN}Found '16.04' (focal)\n"
-            sudo add-apt-repository ppa:mc3man/focal6
+            add-apt-repository ppa:mc3man/focal6
             ;; 
         *) printf "${RED}Failed to find Debian Release${NC}\n";; 
     esac
-    printf "Updating repositories... "
-    log sudo apt update -y
-    printf "Installing ${BLUE}MakeMKV Tools${NC}... "
-    log sudo apt install makemkv-bin makemkv-oss -y
-    printf "Installing ${BLUE}Handbrake Tools${NC}... "
-    log sudo apt install handbrake-cli libavcodec-extra -y
-    printf "Installing ${BLUE}Music CD Tools${NC}... "
-    log sudo apt install abcde flac imagemagick glyrc cdparanoia at -y
-    printf "Installing ${BLUE}Python Tools${NC}... "
-    log sudo apt install python3 python3-pip -y
-    printf "Installing ${BLUE}SSL Tools${NC}... "
-    log sudo apt-get install libcurl4-openssl-dev libssl-dev -y
-    printf "Installing ${BLUE}libdvd${NC}... "
-    log sudo apt-get install libdvd-pkg -y
-    printf "Reconfiguring ${BLUE}makemkv${NC}... "
-    log sudo dpkg-reconfigure libdvd-pkg
-    printf "Installing ${BLUE}Java Runtime Environment${NC}... "
-    log sudo apt install default-jre-headless -y
+    printf " - Updating repositories... "
+    log apt update -y
+    printf " - Installing ${BLUE}MakeMKV Tools${NC}... "
+    log apt install makemkv-bin makemkv-oss -y
+    printf " - Installing ${BLUE}Handbrake Tools${NC}... "
+    log apt install handbrake-cli libavcodec-extra -y
+    printf " - Installing ${BLUE}Music CD Tools${NC}... "
+    log apt install abcde flac imagemagick glyrc cdparanoia at -y
+    printf " - Installing ${BLUE}Python Tools${NC}... "
+    log apt install python3 python3-pip -y
+    printf " - Installing ${BLUE}SSL Tools${NC}... "
+    log apt-get install libcurl4-openssl-dev libssl-dev -y
+    printf " - Installing ${BLUE}libdvd${NC}... "
+    log apt-get install libdvd-pkg -y
+    printf " - Reconfiguring ${BLUE}makemkv${NC}... "
+    log dpkg-reconfigure libdvd-pkg
+    printf " - Installing ${BLUE}Java Runtime Environment${NC}... "
+    log apt install default-jre-headless -y
 
     # Install and setup ARM
-    printf "Creating ${BLUE}/var/lib/arm${NC}... "
-    log sudo mkdir -p /var/lib/arm/config && \
-        sudo mkdir -p /var/lib/arm/db && \
-        sudo mkdir -p /var/lib/arm/cache && \
+    printf " - Creating ${BLUE}/var/lib/arm${NC}... "
+    log mkdir -p /var/lib/arm/config && \
+        mkdir -p /var/lib/arm/db && \
+        mkdir -p /var/lib/arm/cache && \
         chown -R arm:arm /var/lib/arm
 
-    printf "Creating ${BLUE}/opt/arm${NC}... "
-    log sudo mkdir -p /opt/arm && \
-        sudo chown arm:arm /opt/arm
-    printf "Grabbing files from Github... "
+    printf " - Creating ${BLUE}/opt/arm${NC}... "
+    log mkdir -p /opt/arm && \
+        chown arm:arm /opt/arm
+    printf " - Grabbing files from Github... "
     cd /opt/arm
-    log sudo git clone https://github.com/automatic-ripping-machine/automatic-ripping-machine.git /opt/arm && \
-        sudo chown -R arm:arm /opt/arm
-    printf "Installing python requirments... "
-    log sudo pip3 install -r requirements.txt 
-    printf "Configuring automedia rules... "
-    log sudo cp /opt/arm/setup/51-automedia.rules /etc/udev/rules.d/
-    printf "Copying ${BLUE}abcde${NC} config... "
-    log sudo ln -s /opt/arm/setup/abcde.conf /var/lib/arm/config
-    printf "Creating ${BLUE}/opt/arm/arm.yaml${NC}... "
-    log sudo cp docs/arm.yaml.sample /opt/arm/arm.yaml && \
-        sudo mkdir -p /etc/arm/ && \
-        sudo ln -s /opt/arm/arm.yaml /etc/arm/
-    printf "Creating control scripts... "
-    log sudo mkdir -p /usr/local/sbin/arm && \
-        sudo ln -s /opt/arm/scripts/arm-rebuildConfig.sh /usr/local/sbin/
-
+    log git clone https://github.com/automatic-ripping-machine/automatic-ripping-machine.git /opt/arm && \
+        chown -R arm:arm /opt/arm
+    printf " - Installing python requirments... "
+    log pip3 install -r requirements.txt 
+    printf " - Configuring automedia rules... "
+    log cp /opt/arm/setup/51-automedia.rules /etc/udev/rules.d/
+    printf " - Copying ${BLUE}abcde${NC} config... "
+    log ln -s /opt/arm/setup/abcde.conf /var/lib/arm/config
+    printf " - Creating ${BLUE}/opt/arm/arm.yaml${NC}... "
+    log cp docs/arm.yaml.sample /opt/arm/arm.yaml && \
+        mkdir -p /etc/arm/ && \
+        ln -s /opt/arm/arm.yaml /etc/arm/
+    printf " - Creating control scripts... "
+    log mkdir -p /usr/local/sbin/arm && \
+        ln -s /opt/arm/scripts/arm-rebuildConfig.sh /usr/local/sbin/
+    printf "${BLUE}Finished main instalation, locating CD/DVD Drives...${NC}\n====================================================\n"
     for DRIVE in $(more /proc/sys/dev/cdrom/info | awk '/drive name/ {print}' | cut -d ':' -f 2 | tr -d " \t")
     do
         printf "Found CD/DVD drive: ${BLUE}/dev/${DRIVE}${NC}... Rip from this drive? ${YELLOW}[y/n]${NC} "
         read input
         if [[ $input == "y" ]]; then
-            printf "\nCreating Mountpoint for ${BLUE}${DRIVE}${NC}..."
-            log sudo mkdir -p /mnt/dev/$DRIVE && \
-            echo "/dev/$DRIVE  /mnt/dev/$DRIVE  udf,iso9660  user,noauto,exec,utf8  0  0" | sudo tee -a /etc/fstab
+            printf "\n - Creating Mountpoint for ${BLUE}${DRIVE}${NC}..."
+            log mkdir -p /mnt/dev/$DRIVE && \
+            echo "/dev/$DRIVE  /mnt/dev/$DRIVE  udf,iso9660  user,noauto,exec,utf8  0  0" | tee -a /etc/fstab
         else   
-            printf "\nSkipping drive $DRIVE\n"
+            printf "\n - Skipping drive $DRIVE\n"
         fi
     done
 
@@ -136,15 +134,30 @@ stage2() {
     printf "New user created (${BLUE}arm${NC}) with password (${RED}${ARM_PASSWORD}${NC})\n"
 }
 
+main() {
 
-if [ -f /var/run/rebooting-for-updates ]; then
-    stage2
-    sudo rm /var/run/rebooting-for-updates
-    sudo update-rc.d arm-continueInstall remove
-else
-    stage1
-    sudo touch /var/run/rebooting-for-updates
-    echo "
+    if [ -f /var/run/rebooting-for-updates ]; then
+        stage2
+        rm /var/run/rebooting-for-updates
+        update-rc.d arm-continueInstall remove
+    else
+        # Issue disclaimer - you really should read scripts from the Interwebs before running them!
+        if [[ "$EUID" -ne 0 ]]; then 
+            echo -e  "${YELLOW}This script requires elevated priviledges${NC}"
+            exit
+        else
+            echo -e "${RED}This script will make changes to your system${NC}"
+            echo -e "While this is probably what you want, please consider that running a script from the Internet can be a bad thing - especially as it requires elevation."
+            printf "${YELLOW}Do you want to continue?${NC} [y/n] " && read input
+            if [[ $( echo $input | tr '[:lower:]' )  == "y" ]]; then
+                echo -e "${BLUE}Starting install....${NC}"
+                echo -e "===================="
+                stage1
+            fi
+        fi
+        touch /var/run/rebooting-for-updates
+        # Writing script to automatically restart this installation... Formatting intentional...
+        echo "
 #! /bin/sh
 
 ### BEGIN INIT INFO
@@ -159,7 +172,10 @@ case "\$1" in
         ;;
     stop|restart|reload)
         ;;
-esac" | sudo tee -a /etc/init.d/arm-continueInstall
-    sudo update-rc.d arm-continueInstall defaults
-    sudo reboot
-fi
+esac" | tee -a /etc/init.d/arm-continueInstall
+        update-rc.d arm-continueInstall defaults
+        reboot
+    fi
+}
+
+main
