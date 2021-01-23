@@ -153,11 +153,9 @@ main() {
                 echo -e "${BLUE}Starting install....${NC}"
                 echo -e "===================="
                 stage1
-            fi
-        fi
-        touch /var/run/rebooting-for-updates
-        # Writing script to automatically restart this installation... Formatting intentional...
-        echo "
+                touch /var/run/rebooting-for-updates
+                # Writing script to automatically restart this installation... Formatting intentional...
+                echo "
 #! /bin/sh
 
 ### BEGIN INIT INFO
@@ -173,8 +171,10 @@ case "\$1" in
     stop|restart|reload)
         ;;
 esac" > /etc/init.d/arm-continueInstall
-        update-rc.d arm-continueInstall defaults
-        reboot
+                update-rc.d arm-continueInstall defaults
+                reboot
+            fi
+        fi
     fi
 }
 
