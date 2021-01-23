@@ -18,4 +18,5 @@ psutil>=5.4.6
 robobrowser>=0.5.3
 tinydownload>=0.1.0
 netifaces>=0.10.9
+eyeD3>=0.9.6
 

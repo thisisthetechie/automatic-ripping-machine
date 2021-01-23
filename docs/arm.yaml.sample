@@ -35,7 +35,7 @@ MAXLENGTH: "99999"
 MANUAL_WAIT: true
 
 # Wait tie for manual identification (in seconds)
-MANUAL_WAIT_TIME: 600
+MANUAL_WAIT_TIME: 60
 
 # Number of Transcodes that runs at the same time.
 # Certain Video cards are limited to how many encodes they can run at the same time.
@@ -51,15 +51,15 @@ DATA_RIP_PARAMETERS: ""
 
 # Final directory of transcoded files
 # Ripped and transcoded files end up here
-ARMPATH: "/home/arm/media/completed/"
+ARMPATH: "/var/lib/arm/media/completed/"
 
 # Path to raw MakeMKV directory
 # Destination for MakeMKV and source for HandBrake
-RAWPATH: "/home/arm/media/raw/"
+RAWPATH: "/var/lib/arm/media/raw/"
 
 # Path to final media directory
 # Destination for final file.  Only used for movies that are positively identified
-MEDIA_DIR: "/home/arm/media/movies/"
+MEDIA_DIR: "/media/movies/"
 
 # Movie subdirectory name for "extras"
 # Valid names are dependent on your media server
@@ -72,7 +72,7 @@ INSTALLPATH: "/opt/arm/"
 
 # Path to directory to hold log files
 # Make sure to include trailing /
-LOGPATH: "/home/arm/logs/"
+LOGPATH: "/var/lib/arm/logs/"
 
 # Log level.  DEBUG, INFO, WARNING, ERROR, CRITICAL
 # The default is INFO
@@ -82,7 +82,7 @@ LOGLEVEL: "INFO"
 LOGLIFE: 1
 
 # Path to ARM database file
-DBFILE: "/home/arm/db/arm.db"
+DBFILE: "/var/lib/arm/db/arm.db"
 
 ##################
 ##  Web Server  ##
