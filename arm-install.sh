@@ -120,8 +120,8 @@ stage2() {
     for DRIVE in $(more /proc/sys/dev/cdrom/info | awk '/drive name/ {print}' | cut -d ':' -f 2 | tr -d " \t")
     do
         printf "Found CD/DVD drive: ${BLUE}/dev/${DRIVE}${NC}... Rip from this drive? ${YELLOW}[y/n]${NC} "
-        read input
-        if [[ $input == "y" ]]; then
+        read INPUT
+        if [[ $INPUT =~ [yY] ]]; then
             printf "\n - Creating Mountpoint for ${BLUE}${DRIVE}${NC}..."
             log mkdir -p /mnt/dev/$DRIVE && \
             echo "/dev/$DRIVE  /mnt/dev/$DRIVE  udf,iso9660  user,noauto,exec,utf8  0  0" | tee -a /etc/fstab
@@ -148,8 +148,8 @@ main() {
         else
             echo -e "${RED}This script will make changes to your system${NC}"
             echo -e "While this is probably what you want, please consider that running a script from the Internet can be a bad thing - especially as it requires elevation."
-            printf "${YELLOW}Do you want to continue?${NC} [y/n] " && read input
-            if [[ $( echo $input | tr '[:lower:]' )  == "y" ]]; then
+            printf "${YELLOW}Do you want to continue?${NC} [y/n] " && read INPUT
+            if [[ $INPUT =~ [yY] ]]; then
                 echo -e "${BLUE}Starting install....${NC}"
                 echo -e "===================="
                 stage1
