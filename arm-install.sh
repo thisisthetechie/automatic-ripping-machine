@@ -50,7 +50,8 @@ stage2() {
         sudo usermod -aG arm $USER && \
         sudo useradd -m arm -g arm -G cdrom
     printf "Setting ${BLUE}arm${NC} user password... "
-    log sudo passwd arm ---------
+    ARM_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
+    log echo 'arm:${ARM_PASSWORD}' | sudo chpasswd
     printf "Set up repos and install git... "
     log sudo apt-get install git -y && \
         sudo add-apt-repository ppa:heyarje/makemkv-beta && \
@@ -132,6 +133,7 @@ stage2() {
     done
 
     printf "\n${BLUE}Finished installing arm${NC}\n=======================\n\n"
+    printf "New user created (${BLUE}arm${NC}) with password (${RED}${ARM_PASSWORD}${NC})\n"
 }
 
 
